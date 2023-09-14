@@ -1,10 +1,10 @@
 // HTML ELEMENT
 // -----------------------------------------------------------------------
 const question = document.getElementById("question");
-const button1 = document.getElementById("btn1");
-const button2 = document.getElementById("btn2");
-const button3 = document.getElementById("btn3");
-const button4 = document.getElementById("btn4");
+// const button1 = document.getElementById("btn1");
+// const button2 = document.getElementById("btn2");
+// const button3 = document.getElementById("btn3");
+// const button4 = document.getElementById("btn4");
 const score = document.getElementById("totalScore");
 const time = document.getElementById("timeLeft");
 const display = document.getElementById("ui");
@@ -17,33 +17,71 @@ var talliedScore = 0;
 var round = 0;
 var choices = [];
 var correctAnswer = "";
-var currentQuestion = "";
+var timeLeft = 60;
+// var currentQuestion = "";
 var questions = [
     {
-        question: "Why are we here?",
+        question: "Which of the following is not a front-end technology?",
         answer: [
-            { text: "Love", answer: false },
-            { text: "The others are wrong", answer: true },
-            { text: "Family", answer: false },
-            { text: "Fame", answer: false },
+            { text: "HTML", answer: false },
+            { text: "CSS", answer: false },
+            { text: "JavaScript", answer: false },
+            { text: "SQL", answer: true },
         ],
     },
     {
-        question: "Whats better cats or dogs?",
+        question:
+            "The purpose of the Front-end framework in Full stack development is ____.",
         answer: [
-            { text: "Puppies", answer: false },
-            { text: "Dogs", answer: false },
-            { text: "Old Puppers", answer: false },
-            { text: "All of the above.", answer: true },
+            { text: "To provide the client-side interface", answer: true },
+            { text: "To manage database", answer: false },
+            { text: "To reduce the server load", answer: false },
+            { text: "To send http requests", answer: false },
         ],
     },
     {
-        question: "Why are we here?",
+        question: "What is a Front-end framework?",
         answer: [
-            { text: "Love", answer: false },
-            { text: "The others are wrong", answer: true },
-            { text: "Family", answer: false },
-            { text: "Fame", answer: false },
+            {
+                text: "A development platform for developing user-interface for software applications",
+                answer: true,
+            },
+            {
+                text: "A database to store and manage the data of an application",
+                answer: false,
+            },
+            {
+                text: "A development platform for writing server-side logic",
+                answer: false,
+            },
+            { text: "None of the above", answer: false },
+        ],
+    },
+    {
+        question: "What does the term Full Stack Development refer to?",
+        answer: [
+            {
+                text: "Development that involves stack data structures",
+                answer: false,
+            },
+            {
+                text: "Development that involves front-end and back-end programming",
+                answer: true,
+            },
+            {
+                text: "Development that involves only backend programming",
+                answer: false,
+            },
+            { text: "None of the above", answer: false },
+        ],
+    },
+    {
+        question: "What is Git?",
+        answer: [
+            { text: "Framework", answer: false },
+            { text: "Version control system", answer: true },
+            { text: "Database", answer: false },
+            { text: "Package manager", answer: false },
         ],
     },
 ];
@@ -62,16 +100,21 @@ function getQuestion(num) {
 }
 
 function checkAnswer(eventObj) {
-    var el = eventObj.target;
+    var clickedButton = eventObj.target;
 
-    if (el.tagName === "BUTTON") {
-        if (el.innerText == correctAnswer) {
+    if (clickedButton.tagName === "BUTTON") {
+        if (clickedButton.innerText == correctAnswer) {
             talliedScore = talliedScore + 10;
             score.innerText = talliedScore;
-            console.log("You are correct");
             round++;
             checkEnd();
         } else {
+            // Wrong Notification
+            const wrong = document.createElement("h3");
+            wrong.innerText = "Incorrect";
+            buttons.append(wrong);
+
+            timeLeft = timeLeft - 4;
             round++;
             checkEnd();
         }
@@ -80,7 +123,7 @@ function checkAnswer(eventObj) {
 
 function checkEnd() {
     if (round < questions.length) {
-        startQuiz();
+        promptQuiz();
     } else {
         endQuiz();
     }
@@ -88,20 +131,32 @@ function checkEnd() {
 
 function endQuiz() {
     removeAllChildren();
+
     question.innerText = "Finished";
+    var endResult = document.createElement("h3");
+    endResult.innerText = "Final Score: " + talliedScore;
+    buttons.append(endResult);
 }
 
 function startTimer() {
-    var timeLeft = 60;
+    // var timeLeft = 60;
     var timerId = setInterval(countdown, 1000);
 
     function countdown() {
         if (timeLeft == 0) {
             clearTimeout(timerId);
+            time.innerText = "0";
             endQuiz();
+        } else if (round === questions.length) {
+            time.innerText = timeLeft;
+            clearTimeout(timerId);
         } else {
             time.innerHTML = timeLeft;
             timeLeft--;
+        }
+
+        if (timeLeft < 10) {
+            time.style.color = "red";
         }
     }
 }
@@ -112,7 +167,25 @@ function removeAllChildren() {
     }
 }
 
+function beginQuiz() {
+    question.innerHTML = "Press the button to start the quiz.";
+
+    // Start Button
+    var startButton = document.createElement("button");
+    startButton.innerText = "Start";
+    display.append(startButton);
+
+    startButton.addEventListener("click", startQuiz);
+}
+
 function startQuiz() {
+    var startButton = display.querySelector("button");
+    startButton.remove();
+    startTimer();
+    promptQuiz();
+}
+
+function promptQuiz() {
     choices = [];
     getQuestion(round);
 
@@ -133,6 +206,8 @@ function startQuiz() {
 
 // RUN PROGRAM
 // -----------------------------------------------------------------------
-startQuiz();
-startTimer();
+beginQuiz();
+// startTimer();
+// startQuiz();
+
 // startQuiz(round);
