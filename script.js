@@ -1,3 +1,23 @@
+// HTML ELEMENT
+// -----------------------------------------------------------------------
+const question = document.getElementById("question");
+const button1 = document.getElementById("btn1");
+const button2 = document.getElementById("btn2");
+const button3 = document.getElementById("btn3");
+const button4 = document.getElementById("btn4");
+const score = document.getElementById("totalScore");
+const time = document.getElementById("timeLeft");
+const display = document.getElementById("ui");
+
+const buttons = document.getElementById("buttons");
+
+// VARIABLES
+// -----------------------------------------------------------------------
+var talliedScore = 0;
+var round = 0;
+var choices = [];
+var correctAnswer = "";
+var currentQuestion = "";
 var questions = [
     {
         question: "Why are we here?",
@@ -28,64 +48,91 @@ var questions = [
     },
 ];
 
-const question = document.getElementById("question");
-const button1 = document.getElementById("btn1");
-const button2 = document.getElementById("btn2");
-const button3 = document.getElementById("btn3");
-const button4 = document.getElementById("btn4");
-const score = document.getElementById("totalScore");
-
-// VARIABLES
-// -----------------------------------------------------------------------
-var talliedScore = 0;
-
 // FUNCTIONS
 // -----------------------------------------------------------------------
-function changeQuestion(questionNumber) {
-    question.innerHTML = questions[questionNumber].question;
-    button1.innerHTML = questions[questionNumber].answer[0].text;
-    button2.innerHTML = questions[questionNumber].answer[1].text;
-    button3.innerHTML = questions[questionNumber].answer[2].text;
-    button4.innerHTML = questions[questionNumber].answer[3].text;
-}
+function getQuestion(num) {
+    question.innerText = questions[num].question;
+    for (var i = 0; i < questions[num].answer.length; i++) {
+        choices.push(questions[num].answer[i].text);
 
-function checkAnswer(buttonNum, questionNum, answerNum) {
-    if (questions[questionNum].answer[answerNum].answer === true) {
-        buttonNum.style.backgroundColor = "lightgreen";
-        score.innerHTML = talliedScore + 5;
-    } else {
-        buttonNum.style.backgroundColor = "rgb(247, 79, 79)";
+        if (questions[num].answer[i].answer === true) {
+            correctAnswer = questions[num].answer[i].text;
+        }
     }
 }
 
-function promptQuestion(questionIndex) {
-    changeQuestion(questionIndex);
+function checkAnswer(eventObj) {
+    var el = eventObj.target;
 
-    button1.addEventListener("click", function () {
-        checkAnswer(button1, questionIndex, 0);
-    });
-
-    button2.addEventListener("click", function () {
-        checkAnswer(button2, questionIndex, 1);
-    });
-
-    button3.addEventListener("click", function () {
-        checkAnswer(button3, questionIndex, 2);
-    });
-
-    button4.addEventListener("click", function () {
-        checkAnswer(button4, questionIndex, 3);
-    });
+    if (el.tagName === "BUTTON") {
+        if (el.innerText == correctAnswer) {
+            talliedScore = talliedScore + 10;
+            score.innerText = talliedScore;
+            console.log("You are correct");
+            round++;
+            checkEnd();
+        } else {
+            round++;
+            checkEnd();
+        }
+    }
 }
 
-function startQuiz(index) {
-    promptQuestion(index);
+function checkEnd() {
+    if (round < questions.length) {
+        startQuiz();
+    } else {
+        endQuiz();
+    }
 }
+
+function endQuiz() {
+    removeAllChildren();
+    question.innerText = "Finished";
+}
+
+function startTimer() {
+    var timeLeft = 60;
+    var timerId = setInterval(countdown, 1000);
+
+    function countdown() {
+        if (timeLeft == 0) {
+            clearTimeout(timerId);
+            endQuiz();
+        } else {
+            time.innerHTML = timeLeft;
+            timeLeft--;
+        }
+    }
+}
+
+function removeAllChildren() {
+    while (buttons.firstChild) {
+        buttons.removeChild(buttons.firstChild);
+    }
+}
+
+function startQuiz() {
+    choices = [];
+    getQuestion(round);
+
+    removeAllChildren();
+
+    choices.forEach(function (choice) {
+        var btn = document.createElement("button");
+        btn.innerText = choice;
+        buttons.append(btn);
+    });
+
+    buttons.addEventListener("click", checkAnswer);
+}
+
+// function endQuiz() {
+//     display.innerHTML = "<h1>Quiz Over</h1>";
+// }
 
 // RUN PROGRAM
 // -----------------------------------------------------------------------
-startQuiz(1);
-
-// -----------------------------------------------------------------------
-
-console.log(questions[1].answer[3].answer);
+startQuiz();
+startTimer();
+// startQuiz(round);
