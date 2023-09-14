@@ -26,7 +26,7 @@ body {
     background-color: blue;
 }
 
-.ui {
+#ui {
     background-color: white;
     width: 70%;
     height: 360px;
