@@ -1,92 +1,34 @@
 // HTML ELEMENT
 // -----------------------------------------------------------------------
-const question = document.getElementById("question");
-// const button1 = document.getElementById("btn1");
-// const button2 = document.getElementById("btn2");
-// const button3 = document.getElementById("btn3");
-// const button4 = document.getElementById("btn4");
-const score = document.getElementById("totalScore");
-const time = document.getElementById("timeLeft");
-const display = document.getElementById("ui");
-
 const buttons = document.getElementById("buttons");
+const display = document.getElementById("ui");
+const question = document.getElementById("question");
+const totalScore = document.getElementById("totalScore");
+const time = document.getElementById("timeLeft");
 
 // VARIABLES
 // -----------------------------------------------------------------------
-var talliedScore = 0;
-var round = 0;
 var choices = [];
 var correctAnswer = "";
+var incorrectPrompt = 0;
+var round = 0;
+var talliedScore = 0;
 var timeLeft = 60;
-// var currentQuestion = "";
-var questions = [
-    {
-        question: "Which of the following is not a front-end technology?",
-        answer: [
-            { text: "HTML", answer: false },
-            { text: "CSS", answer: false },
-            { text: "JavaScript", answer: false },
-            { text: "SQL", answer: true },
-        ],
-    },
-    {
-        question:
-            "The purpose of the Front-end framework in Full stack development is ____.",
-        answer: [
-            { text: "To provide the client-side interface", answer: true },
-            { text: "To manage database", answer: false },
-            { text: "To reduce the server load", answer: false },
-            { text: "To send http requests", answer: false },
-        ],
-    },
-    {
-        question: "What is a Front-end framework?",
-        answer: [
-            {
-                text: "A development platform for developing user-interface for software applications",
-                answer: true,
-            },
-            {
-                text: "A database to store and manage the data of an application",
-                answer: false,
-            },
-            {
-                text: "A development platform for writing server-side logic",
-                answer: false,
-            },
-            { text: "None of the above", answer: false },
-        ],
-    },
-    {
-        question: "What does the term Full Stack Development refer to?",
-        answer: [
-            {
-                text: "Development that involves stack data structures",
-                answer: false,
-            },
-            {
-                text: "Development that involves front-end and back-end programming",
-                answer: true,
-            },
-            {
-                text: "Development that involves only backend programming",
-                answer: false,
-            },
-            { text: "None of the above", answer: false },
-        ],
-    },
-    {
-        question: "What is Git?",
-        answer: [
-            { text: "Framework", answer: false },
-            { text: "Version control system", answer: true },
-            { text: "Database", answer: false },
-            { text: "Package manager", answer: false },
-        ],
-    },
-];
 
-// FUNCTIONS
+// HELPER FUNCTIONS
+// -----------------------------------------------------------------------
+function removeAllChildren() {
+    while (buttons.firstChild) {
+        buttons.removeChild(buttons.firstChild);
+    }
+}
+
+function removeResultPrompt() {
+    var resultPrompt = document.querySelector("h3");
+    resultPrompt.remove();
+}
+
+// LOGIC FUNCTIONS
 // -----------------------------------------------------------------------
 function getQuestion(num) {
     question.innerText = questions[num].question;
@@ -103,21 +45,39 @@ function checkAnswer(eventObj) {
     var clickedButton = eventObj.target;
 
     if (clickedButton.tagName === "BUTTON") {
+        if (incorrectPrompt === 1) {
+            removeResultPrompt();
+            incorrectPrompt = 0;
+            console.log("After reset" + incorrectPrompt);
+        }
+
+        var wrong = document.createElement("h3");
+
         if (clickedButton.innerText == correctAnswer) {
+            // Correct Notification
             talliedScore = talliedScore + 10;
-            score.innerText = talliedScore;
-            round++;
-            checkEnd();
+            totalScore.innerText = talliedScore;
+            wrong.innerText = "Correct";
+            wrong.style.color = "green";
+
+            // round++;
+            // checkEnd();
         } else {
-            // Wrong Notification
-            const wrong = document.createElement("h3");
+            // Incorrect Notification
             wrong.innerText = "Incorrect";
-            buttons.append(wrong);
+            wrong.style.color = "red";
+
+            console.log("here");
 
             timeLeft = timeLeft - 4;
-            round++;
-            checkEnd();
+            console.log("After Wrong" + incorrectPrompt);
+            // round++;
+            // checkEnd();
         }
+        incorrectPrompt = 1;
+        display.append(wrong);
+        round++;
+        checkEnd();
     }
 }
 
@@ -131,56 +91,74 @@ function checkEnd() {
 
 function endQuiz() {
     removeAllChildren();
+    removeResultPrompt();
 
     question.innerText = "Finished";
+
+    // End Score
     var endResult = document.createElement("h3");
     endResult.innerText = "Final Score: " + talliedScore;
     buttons.append(endResult);
+
+    // Initials input
+    var input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Enter your initials";
+    input.className = "initial-input";
+    buttons.append(input);
 }
 
 function startTimer() {
-    // var timeLeft = 60;
-    var timerId = setInterval(countdown, 1000);
+    var timer = setInterval(function () {
+        timeLeft--;
 
-    function countdown() {
-        if (timeLeft == 0) {
-            clearTimeout(timerId);
-            time.innerText = "0";
+        if (timeLeft < 0) {
+            timeLeft = 0;
+        }
+
+        if (round === questions.length) {
+            clearInterval(timer);
+        }
+
+        time.innerText = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
             endQuiz();
-        } else if (round === questions.length) {
-            time.innerText = timeLeft;
-            clearTimeout(timerId);
-        } else {
-            time.innerHTML = timeLeft;
-            timeLeft--;
         }
 
         if (timeLeft < 10) {
             time.style.color = "red";
+            time.innerText = "0" + timeLeft;
         }
-    }
+    }, 1000);
 }
 
-function removeAllChildren() {
-    while (buttons.firstChild) {
-        buttons.removeChild(buttons.firstChild);
-    }
-}
-
-function beginQuiz() {
+// INITIALIZATION FUNCTIONS
+// -----------------------------------------------------------------------
+function startScreen() {
     question.innerHTML = "Press the button to start the quiz.";
+
+    // Explanation
+    var explanation = document.createElement("p");
+    explanation.innerText =
+        "You will have 60 seconds to complete this quiz. Each wrong answer will subtract 4 seconds from your timer.";
+    display.append(explanation);
 
     // Start Button
     var startButton = document.createElement("button");
     startButton.innerText = "Start";
     display.append(startButton);
 
+    displayHighScores();
+
     startButton.addEventListener("click", startQuiz);
 }
 
 function startQuiz() {
     var startButton = display.querySelector("button");
+    var explanation = display.querySelector("p");
     startButton.remove();
+    explanation.remove();
     startTimer();
     promptQuiz();
 }
@@ -200,14 +178,12 @@ function promptQuiz() {
     buttons.addEventListener("click", checkAnswer);
 }
 
-// function endQuiz() {
-//     display.innerHTML = "<h1>Quiz Over</h1>";
-// }
+function displayHighScores() {
+    var highScore = document.createElement("h3");
+    highScore.innerText = "High Scores";
+    display.append(highScore);
+}
 
 // RUN PROGRAM
 // -----------------------------------------------------------------------
-beginQuiz();
-// startTimer();
-// startQuiz();
-
-// startQuiz(round);
+startScreen();
