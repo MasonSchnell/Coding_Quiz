@@ -45,10 +45,9 @@ function checkAnswer(eventObj) {
     var clickedButton = eventObj.target;
 
     if (clickedButton.tagName === "BUTTON") {
-        if (incorrectPrompt === 1) {
+        if (incorrectPrompt === 1 && round < questions.length) {
             removeResultPrompt();
             incorrectPrompt = 0;
-            console.log("After reset" + incorrectPrompt);
         }
 
         var wrong = document.createElement("h3");
@@ -67,10 +66,8 @@ function checkAnswer(eventObj) {
             wrong.innerText = "Incorrect";
             wrong.style.color = "red";
 
-            console.log("here");
-
             timeLeft = timeLeft - 4;
-            console.log("After Wrong" + incorrectPrompt);
+
             // round++;
             // checkEnd();
         }
@@ -81,14 +78,17 @@ function checkAnswer(eventObj) {
     }
 }
 
+var quizEnded = 0;
 function checkEnd() {
     if (round < questions.length) {
         promptQuiz();
     } else {
         endQuiz();
+        quizEnded++;
     }
 }
 
+var testerName = "";
 function endQuiz() {
     removeAllChildren();
     removeResultPrompt();
@@ -98,14 +98,24 @@ function endQuiz() {
     // End Score
     var endResult = document.createElement("h3");
     endResult.innerText = "Final Score: " + talliedScore;
-    buttons.append(endResult);
+    display.append(endResult);
 
     // Initials input
     var input = document.createElement("input");
     input.type = "text";
     input.placeholder = "Enter your initials";
     input.className = "initial-input";
-    buttons.append(input);
+    display.append(input);
+
+    // Submit button
+    var submit = document.createElement("button");
+    submit.innerHTML = "Submit";
+    submit.className = "submit";
+    display.append(submit);
+
+    submit.addEventListener("click", updateHighScores);
+
+    displayHighScores();
 }
 
 function startTimer() {
@@ -123,7 +133,9 @@ function startTimer() {
         time.innerText = timeLeft;
         if (timeLeft <= 0) {
             clearInterval(timer);
-            endQuiz();
+            if (quizEnded === 0) {
+                endQuiz();
+            }
         }
 
         if (timeLeft < 10) {
@@ -149,6 +161,7 @@ function startScreen() {
     startButton.innerText = "Start";
     display.append(startButton);
 
+    establishLocalStorage();
     displayHighScores();
 
     startButton.addEventListener("click", startQuiz);
@@ -157,10 +170,24 @@ function startScreen() {
 function startQuiz() {
     var startButton = display.querySelector("button");
     var explanation = display.querySelector("p");
+    var highScoreDisplay = display.querySelector("h3");
     startButton.remove();
     explanation.remove();
+    highScoreDisplay.remove();
+    var leaderBoardDisplay = display.querySelector("#scoreBoard");
+    leaderBoardDisplay.remove();
+
     startTimer();
     promptQuiz();
+}
+
+function updateHighScoreDisplay() {
+    var highScoreDisplay = display.querySelector("h3");
+    highScoreDisplay.remove();
+    var leaderBoardDisplay = display.querySelector("#scoreBoard");
+    leaderBoardDisplay.remove();
+
+    displayHighScores();
 }
 
 function promptQuiz() {
@@ -181,9 +208,109 @@ function promptQuiz() {
 function displayHighScores() {
     var highScore = document.createElement("h3");
     highScore.innerText = "High Scores";
+    highScore.className = "highScore";
     display.append(highScore);
+
+    var scoreBoard = document.createElement("p");
+    scoreBoard.innerText = "";
+    scoreBoard.setAttribute("id", "scoreBoard");
+    display.append(scoreBoard);
+
+    leaderBoard = getHighScores();
+    var position = 1;
+    leaderBoard.forEach(function (eventObj) {
+        var player =
+            " " +
+            position +
+            ") " +
+            eventObj.name +
+            ": " +
+            eventObj.score +
+            " points ";
+        scoreBoard.innerText += player;
+        position++;
+    });
+
+    establishLocalStorage();
 }
 
+//=======================================================================
+
+function getHighScores() {
+    return JSON.parse(localStorage.getItem("highScores")) || [];
+}
+
+function getHighScoresDisplay() {
+    return JSON.stringify(localStorage.getItem("highScores")) || [];
+}
+
+function establishLocalStorage() {
+    if (localStorage.getItem("highScores") === null) {
+        var highScores = {
+            name: "N/A",
+            score: 0,
+        };
+
+        var highScoresBase = getHighScores();
+
+        for (var i = 0; i < 5; i++) {
+            highScoresBase.push(highScores);
+        }
+
+        localStorage.setItem("highScores", JSON.stringify(highScoresBase));
+    }
+}
+
+function updateHighScores(eventObj) {
+    eventObj.preventDefault();
+    var highScores1 = getHighScores();
+
+    var inputValue = document.querySelector(".initial-input");
+    console.log(inputValue);
+    testerName = inputValue.value;
+
+    console.log("Input value: " + testerName);
+
+    var thingy = getHighScores();
+
+    var through = 0;
+
+    highScores1.forEach(function (highScoreObj) {
+        if (highScoreObj.score < talliedScore) {
+            // Saves previous score. Changes score to whats taking its place. Changes old value to score and name so that it can be compared to the next value down the list.
+
+            let repName = highScoreObj.name;
+            let repScore = highScoreObj.score;
+            console.log("Previous name: " + highScoreObj.name);
+            highScoreObj.name = testerName;
+            console.log("New name: " + highScoreObj.name);
+            highScoreObj.score = talliedScore;
+            testerName = repName;
+            talliedScore = repScore;
+
+            var newScore = {
+                name: highScoreObj.name,
+                score: highScoreObj.score,
+            };
+            console.log("New Score: " + JSON.stringify(newScore));
+
+            thingy[through] = newScore;
+            localStorage.setItem("highScores", JSON.stringify(thingy));
+        } else if (highScoreObj.score === talliedScore) {
+            // var newScore = {
+            //     name: testerName,
+            //     score: talliedScore,
+            // };
+            // thingy.push(newScore);
+            // localStorage.setItem("highScores", JSON.stringify(thingy));
+        }
+        through++;
+    });
+
+    updateHighScoreDisplay();
+}
+
+//=======================================================================
 // RUN PROGRAM
 // -----------------------------------------------------------------------
 startScreen();

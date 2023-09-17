@@ -26,15 +26,25 @@ h3 {
     align-items: center;
 }
 
-.initial-input {
+.initial-input,
+.submit {
     width: 40%;
     height: 30px;
     margin: 10px 30% 0;
     text-align: center;
 }
 
+.highScore {
+    text-decoration: underline;
+}
+
 .timer {
     display: flex;
+}
+
+#scoreBoard {
+    font-size: medium;
+    text-decoration: dotted;
 }
 
 .timer h2 {
