@@ -1,3 +1,4 @@
+/* GENERAL STYLES */
 * {
     margin: 0;
     padding: 0;
@@ -5,6 +6,11 @@
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 
+body {
+    background-color: rgb(43, 43, 194);
+}
+
+/* HEADER STYLES */
 header {
     display: flex;
     align-items: center;
@@ -14,18 +20,21 @@ header {
     padding: 7px 3%;
 }
 
+/* TEXT STYLES */
 p,
 h3 {
     text-align: center;
     margin-top: 5px;
 }
 
+/* CENTERING STYLES */
 .center {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* INPUT STYLES */
 .initial-input,
 .submit {
     width: 40%;
@@ -34,27 +43,26 @@ h3 {
     text-align: center;
 }
 
-.highScore {
+/* HIGH SCORE STYLES */
+#highScore {
     text-decoration: underline;
 }
 
-.timer {
-    display: flex;
+#scoreBoard {
+    font-weight: bold;
+    text-decoration: solid;
 }
 
-#scoreBoard {
-    font-size: medium;
-    text-decoration: dotted;
+/* TIMER STYLES */
+.timer {
+    display: flex;
 }
 
 .timer h2 {
     margin-right: 5px;
 }
 
-body {
-    background-color: rgb(43, 43, 194);
-}
-
+/* UI CONTAINING STYLES */
 #ui {
     background-color: rgb(245, 245, 245);
     width: 70%;
@@ -64,10 +72,12 @@ body {
     padding: 30px;
 }
 
+/* QUESTION STYLES */
 #question {
     text-align: center;
 }
 
+/* BUTTON STYLES */
 button {
     display: flex;
     justify-content: center;
@@ -83,6 +93,7 @@ button {
     background-color: rgb(225, 225, 225);
 }
 
+/* BUTTON HOVER STYLES */
 button:hover {
     background-color: rgba(0, 0, 0, 0.3);
 }
