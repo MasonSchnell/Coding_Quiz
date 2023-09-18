@@ -8,30 +8,35 @@ const time = document.getElementById("timeLeft");
 
 // VARIABLES
 // -----------------------------------------------------------------------
-var choices = [];
-var correctAnswer = "";
-var incorrectPrompt = 0;
-var round = 0;
-var talliedScore = 0;
-var timeLeft = 60;
-var isQuizEnded = 0;
-var testerName = "";
+let choices = [];
+let correctAnswer = "";
+let incorrectPrompt = 0;
+let round = 0;
+let talliedScore = 0;
+let timeLeft = 60;
+let isQuizEnded = 0;
+let testerName = "";
 
 // HELPER FUNCTIONS
 // -----------------------------------------------------------------------
-function removeAllChildren() {
+
+// Clears all child elements from the buttonContainer.
+function clearButtonContainer() {
     while (buttonContainer.firstChild) {
         buttonContainer.removeChild(buttonContainer.firstChild);
     }
 }
 
-function removeResultPrompt() {
-    var resultPrompt = document.querySelector("h3");
+// Removes the question result prompt (ex. Correct or Incorrect).
+function removeQuizResultPrompt() {
+    const resultPrompt = document.querySelector("h3");
     resultPrompt.remove();
 }
 
 // LOGIC FUNCTIONS
 // -----------------------------------------------------------------------
+
+// Gets the questions and its multiple choice answers.
 function getQuestion(num) {
     question.innerText = questions[num].question;
     for (var i = 0; i < questions[num].answer.length; i++) {
@@ -43,16 +48,17 @@ function getQuestion(num) {
     }
 }
 
+// Checks users selected answer.
 function checkAnswer(eventObj) {
     var clickedButton = eventObj.target;
 
     if (clickedButton.tagName === "BUTTON") {
         if (incorrectPrompt === 1 && round < questions.length) {
-            removeResultPrompt();
+            removeQuizResultPrompt();
             incorrectPrompt = 0;
         }
 
-        var resultMessage = document.createElement("h3");
+        const resultMessage = document.createElement("h3");
 
         if (clickedButton.innerText == correctAnswer) {
             // Correct Notification
@@ -74,9 +80,10 @@ function checkAnswer(eventObj) {
     }
 }
 
+// Checks if the quiz has ended.
 function checkEnd() {
     if (round < questions.length) {
-        promptQuiz();
+        setupQuizQuestion();
     } else {
         endQuiz();
         isQuizEnded++;
@@ -84,8 +91,8 @@ function checkEnd() {
 }
 
 function endQuiz() {
-    removeAllChildren();
-    removeResultPrompt();
+    clearButtonContainer();
+    removeQuizResultPrompt();
 
     question.innerText = "Finished";
 
@@ -151,11 +158,11 @@ function updateHighScoreDisplay() {
     displayHighScores();
 }
 
-function promptQuiz() {
+function setupQuizQuestion() {
     choices = [];
     getQuestion(round);
 
-    removeAllChildren();
+    clearButtonContainer();
 
     choices.forEach(function (choice) {
         var btn = document.createElement("button");
@@ -167,18 +174,18 @@ function promptQuiz() {
 }
 
 function displayHighScores() {
-    var highScoreMessage = document.createElement("h3");
+    const highScoreMessage = document.createElement("h3");
     highScoreMessage.innerText = "High Scores";
     highScoreMessage.setAttribute("id", "highScore");
     uiContainer.append(highScoreMessage);
 
-    var scoreBoardElement = document.createElement("p");
+    const scoreBoardElement = document.createElement("p");
     scoreBoardElement.innerText = "";
     scoreBoardElement.setAttribute("id", "scoreBoard");
     uiContainer.append(scoreBoardElement);
 
-    leaderBoard = getHighScores();
-    var position = 1;
+    let leaderBoard = getHighScores();
+    let position = 1;
     leaderBoard.forEach(function (eventObj) {
         var player =
             " | " +
@@ -196,6 +203,8 @@ function displayHighScores() {
 }
 // INITIALIZATION FUNCTIONS
 // -----------------------------------------------------------------------
+
+// Displays the start screen.
 function startScreen() {
     question.innerHTML = "Press the button to start the quiz.";
 
@@ -206,7 +215,7 @@ function startScreen() {
     uiContainer.append(explanationElement);
 
     // Start Button
-    var startButtonElement = document.createElement("button");
+    const startButtonElement = document.createElement("button");
     startButtonElement.innerText = "Start";
     uiContainer.append(startButtonElement);
 
@@ -227,9 +236,10 @@ function startQuiz() {
     leaderBoardDisplayElement.remove();
 
     startTimer();
-    promptQuiz();
+    setupQuizQuestion();
 }
-// ==============================================================
+
+// Checks the users initials input for errors.
 function checkInput(eventObj) {
     eventObj.preventDefault();
     var inputValueElement = document.querySelector(".initial-input");
@@ -242,20 +252,9 @@ function checkInput(eventObj) {
         inputValueElement.innerText = " ";
     }
 }
-// ==============================================================
+
 function updateHighScores() {
-    // eventObj.preventDefault();
-
-    // var inputValueElement = document.querySelector(".initial-input");
-    // var inputText = inputValueElement.value.trim();
-
-    // if (/^[a-zA-Z]{2}$/.test(inputText)) {
-    //     updateHighScores();
-    // } else {
-    //     alert("You must enter two letters.");
-    // }
-
-    var highScoresList = getHighScores();
+    let highScoresList = getHighScores();
 
     var inputValueElement = document.querySelector(".initial-input");
     console.log(inputValueElement);
@@ -266,7 +265,7 @@ function updateHighScores() {
 
     var scoreSheet = getHighScores();
 
-    var index = 0;
+    let index = 0;
 
     highScoresList.forEach(function (highScoreObj) {
         if (highScoreObj.score < talliedScore) {
@@ -298,14 +297,12 @@ function updateHighScores() {
 // LOCAL STORAGE FUNCTIONS
 // -----------------------------------------------------------------------
 
+// Gets high scores from local storage.
 function getHighScores() {
     return JSON.parse(localStorage.getItem("highScores")) || [];
 }
 
-// function getHighScoresDisplay() {
-//     return JSON.stringify(localStorage.getItem("highScores")) || [];
-// }
-
+// Establishes the local storage if there are no high scores stored.
 function establishLocalStorage() {
     if (localStorage.getItem("highScores") === null) {
         var highScores = {

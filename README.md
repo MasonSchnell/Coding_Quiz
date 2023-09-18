@@ -1,10 +1,12 @@
-# Full Stack Developer Quiz
+# Full Stack Coding Quiz
+
+![Full Stack Coding Quiz Screenshot](<images/Screenshot (7).png>)
 
 This full stack developer quiz is designed to test your knowledge of various topics related to full-stack development.
 
 ## Quiz Structure
 
-The quiz is has questions that range from the topics of:
+The quiz has questions that range from the topics of:
 
 -   Full-Stack Development
 -   Front-End Development
@@ -21,6 +23,7 @@ The quiz is has questions that range from the topics of:
 
 -   Rutgers Full Stack Development Team
 -   w3resource
+-   ChatGPT (Quiz Question Generation)
 
 ## Liscence
 
