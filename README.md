@@ -2,7 +2,7 @@
 
 ![Full Stack Coding Quiz Screenshot](<images/Screenshot (7).png>)
 
-This full stack developer quiz is designed to test your knowledge of various topics related to full-stack development.
+This full stack developer quiz is designed to test your knowledge of various topics related to full-stack development. [Website Link](https://masonschnell.github.io/coding_quiz/)
 
 ## Quiz Structure
 
